@@ -1,7 +1,7 @@
 .PHONY: all clean
 
-all: polynome tests main afterhandclean
-run: polynome tests main afterhandclean runner
+all: clean polynome tests main afterhandclean
+run: clean polynome tests main afterhandclean runner
 
 polynome: polynome.c
 	gcc -c polynome.c
