@@ -1,7 +1,7 @@
 #include "polynome.h"
 
 // Entrée: un tableau contenant les coefficients du polynome ainsi que le degré désiré
-// Sortie: Un pointteur vers l'objet polynome correspondant aux coefficients fournis
+// Sortie: Un pointeur vers l'objet polynome correspondant aux coefficients fournis
 polynome* creer_poly(int tab[], int deg) {
 
     while (tab[deg] == 0) {
@@ -249,7 +249,7 @@ polynome* addition(polynome* poly1, polynome* poly2) {
 // Sortie: Un pointeur vers un objet polynome dont tous les coefficients ont etes multiplies par a
 polynome* produit_par_scalaire(polynome* poly, int a) {
 
-    // Si le scalaire est nul, on renvoie la fonction nulle car P(x) * 0 = 0
+    // Si le scalaire est nul, on renvoie le polynome nul car P(x) * 0 = 0
     if (a == 0) {
         int* t = (int*)malloc(sizeof(int));
         polynome* r = (polynome*)malloc(sizeof(polynome));
@@ -328,17 +328,11 @@ polynome* creer_a_la_main(void) {
     int* degree = (int*)malloc(sizeof(int));
     char key = 'x';
 
-    int temp = 0;
-
-    //printf("%d", *degree);
-
-    //printf("Degree du polynome : ");
     printf("Degree du polynome : ");
     if (scanf("%d%c", degree, &key) != 2 || key != '\n') {
         printf("L'entree n'est pas un nombre, fin du programme\n");
         exit(1);
     }
-
 
     int* t = (int*)malloc(sizeof(int) * (*degree + 1));
     polynome* resultat = (polynome*)malloc(sizeof(polynome));
@@ -362,263 +356,4 @@ polynome* creer_a_la_main(void) {
     resultat -> degree = *degree;
 
     return resultat;
-}
-
-
-/* FIN DES FONCTIONS DEMANDEES */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// FONCTIONS NON DEMANDEES
-
-// Prend deux polynomes et renvoie poly1 - poly2
-polynome* soustraction(polynome* poly1, polynome* poly2) {
-
-    int deg1 = poly1 -> degree;
-    int deg2 = poly2 -> degree;
-
-    int max_degree = deg1 > deg2 ? deg1 : deg2;
-    int n = max_degree;
-
-    for (int i = n; i > 0; i = i - 1) {
-        // seule modification ici: '+' -> '-' pour le test d'egalite
-        if ((poly1 -> coefs)[i] - (poly2 -> coefs)[i] == 0) {
-            max_degree = max_degree - 1;
-        } else {
-            break;
-        }
-    }
-
-    int* t = (int*)malloc(sizeof(int) * max_degree);
-    polynome* new_poly = (polynome*)malloc(sizeof(polynome));
-
-    for (int i = 0; i <= max_degree; i = i + 1) {
-        
-        t[i] = 0;
-
-        if (i <= deg1) {
-            t[i] = t[i] + (poly1 -> coefs)[i];
-        }
-
-        if (i <= deg2) {
-            // seule modification ici: '+' -> '-'
-            t[i] = t[i] - (poly2 -> coefs)[i];
-        }
-
-    }
-
-    new_poly -> coefs = t;
-    new_poly -> degree = max_degree;
-    
-    return new_poly;
-
-}
-
-// Est utile dans la fonction division, et permet de vérifier que le degrée d'un polynome est bien celui attendu
-// Renvoie donc le degrès du premier coefficient non égal à 0 pour un polynome donné en entrée
-int actual_polynome_degree(polynome* poly) {
-
-    int d = poly -> degree;
-    for (int i = d; i >= 0; i = i - 1) {
-        if ((poly -> coefs)[i] == 0) { // On baisse le dégré tant que les coefficients sont des 0 
-            d = d - 1;
-        } else {
-            break; // Et on sort immédiatement de la boucle quand un coefficient non nul est rencontré
-        }
-    }
-
-    return d;
-
-}
-
-// Sert également dans la fonction division
-// Prend un polynome et le mulitplie par x^(degree), degree étant l'entier fourni 
-polynome* augmenter_degree(polynome* poly1, int degree) {
-
-    if (poly1 -> degree == -1) {
-        printf("Impossible d'éléver le coefficient du polynome nul\n");
-        exit(1);
-    }
-
-    int new_degree = (poly1 -> degree) + degree;
-    int* t = (int*)malloc(sizeof(int) * (new_degree + 1));
-    polynome* r = (polynome*)malloc(sizeof(polynome));
-
-    // On décale tous les coefficients de (degree)
-    for (int i = 0; i <= poly1 -> degree; i = i + 1) {
-        t[i + degree] = (poly1 -> coefs)[i];
-    }
-
-    r -> coefs = t;
-    r -> degree = new_degree; 
-    
-    return r;
-
-}
-
-// Permet de réaliser la copie d'un polynome
-polynome* copie(polynome* poly) {
-
-    int* t;
-    if (poly -> degree == -1) {
-        t = (int*)malloc(sizeof(int) * ((poly -> degree) + 1));
-    } else {
-        t = (int*)malloc(sizeof(int));
-    }
-
-    polynome* r = (polynome*)malloc(sizeof(polynome));
-
-    r -> coefs = t;
-    for (int i = 0; i <= poly -> degree; i = i + 1) {
-        (r -> coefs)[i] = (poly -> coefs)[i];
-    }
-
-    r -> degree = poly -> degree;
-    
-    return r;
-
-}
-
-// Renvoie le résultat de la division longue de numerateur et denominateur
-polynome* division(polynome* num, polynome* denominator) {
-
-    if (denominator -> degree == -1) {
-        printf("Impossible de diviser par 0\n");
-        exit(1);
-    }
-
-    // On réalise une copie de numérateur, car il sera modifié dans la fonction
-    polynome* numerator = copie(num);
-
-    
-    // On défini un quotient
-    int* quotient = (int*)malloc(sizeof(int) * ((numerator -> degree) - (denominator -> degree) + 1));
-
-    int deg_n = numerator -> degree;
-    int deg_d = denominator -> degree;
-
-    // Initialisation du resultat
-    polynome* result = (polynome*)malloc(sizeof(polynome));
-    result -> coefs = quotient;
-    result -> degree = deg_n - deg_d;
-
-    //afficher(result);
-
-    polynome* temp1 = NULL;
-
-    // variant de boucle: "deg_n", entier, minoré par deg_d, et decroit strictement à chaque itération car le but même
-    // de chaque itération est d'annuler le coefficient directeur de deg_n  
-    while (deg_n >= deg_d) {
-
-        temp1 = augmenter_degree(denominator, deg_n - deg_d);
-        quotient[deg_n - deg_d] = (numerator -> coefs)[deg_n] / (temp1 -> coefs)[deg_n];
-
-        temp1 = produit_par_scalaire(temp1, quotient[deg_n - deg_d]);
-
-        numerator = soustraction(numerator, temp1);
-
-        deg_n = actual_polynome_degree(numerator);
-        deg_d = actual_polynome_degree(denominator);
-
-    }
-
-
-     
-    //result -> coefs = (int*)malloc(sizeof(int) * (result -> degree));
-
-
-    //rintf("%d %d %d\n", result -> degree, deg_n, deg_d);
-    //result -> coefs = quotient;
-
-    return result;
-
-}
-
-// Réalise les mêmes opérations que division, mais renvoie le reste à la fin
-polynome* reste(polynome* num, polynome* denominator) {
-
-    if (denominator -> degree == -1) {
-        printf("Impossible de diviser par 0\n");
-        exit(1);
-    }
-
-    // On réalise une copie de numérateur, car il sera modifié dans la fonction
-    polynome* numerator = copie(num);
-    
-    // On défini un quotient
-    int* quotient = (int*)malloc(sizeof(int) * ((numerator -> degree) - (denominator -> degree) + 1));
-
-    int deg_n = numerator -> degree;
-    int deg_d = denominator -> degree;
-
-    polynome* temp1 = NULL;
-
-    while (deg_n >= deg_d) {
-
-        temp1 = augmenter_degree(denominator, deg_n - deg_d);
-        quotient[deg_n - deg_d] = (numerator -> coefs)[deg_n] / (temp1 -> coefs)[deg_n];
-
-        temp1 = produit_par_scalaire(temp1, quotient[deg_n - deg_d]);
-
-        numerator = soustraction(numerator, temp1);
-
-        deg_n = actual_polynome_degree(numerator);
-        deg_d = actual_polynome_degree(denominator);
-
-    }
-
-    // Ce qui reste dans le numérateur correspond au reste
-    numerator -> degree = actual_polynome_degree(numerator);
-    return numerator;
-
-}
-
-// Permet d'évaluer un polynome avec des chiffres décimaux
-double evaluation_double(polynome* poly, double x) {
-
-    if (poly -> degree <= 0) {
-        return (double)(poly -> coefs)[0];
-    }
-
-    // Toujours avec la méthode de Holder
-    double sum = (poly -> coefs)[poly -> degree] * x + (poly -> coefs)[(poly -> degree) - 1];
-    for (int i = poly -> degree - 2; i >= 0; i = i - 1) {
-        sum = x * sum + (poly -> coefs)[i];
-    }
-
-    return sum;
-
-}
-
-// Méthode de newton, qui permet d'approximer des racines
-double newtons_method(polynome* poly, double x0, int iterations) {
-
-    double x_n = x0;
-    
-    polynome* deri = derivee(poly);
-
-    // La méthode de Newton se réalise en utilisant une suite définie par x_(n+1) = x_n - P(x_n)/P'(x_n)
-    for (int i = 0; i < iterations; i = i + 1) {
-        x_n = x_n - evaluation_double(poly, x_n) / evaluation_double(deri, x_n);
-    }
-
-    return x_n;
-
 }

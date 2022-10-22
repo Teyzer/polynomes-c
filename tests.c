@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <assert.h>
 #include "polynome.h"
 #include "tests.h"
 
@@ -7,6 +5,8 @@ void main_test() {
 
     /* Ensemble des tests de fonctions */
     /* Toutes les fonctions demandées sont écrites sans appel à une fonction auxiliaire */
+
+    srand(time(0));
 
     printf("\nDébut des tests\n\n");
 
@@ -22,6 +22,8 @@ void main_test() {
     assert(evaluation(poly_quelconque, 3) == -305);
     assert(evaluation(polynome_nul, 450000054) == 0);;
     assert(test_egalite(derivee(polynome_nul), polynome_nul));
+    assert(test_egalite(addition(polynome_nul, polynome_nul), polynome_nul));
+    assert(test_egalite(addition(polynome_nul, poly_quelconque), poly_quelconque));
 
 
     //Création et affichage de deux polynômes
@@ -37,11 +39,11 @@ void main_test() {
 
     //Affichage évaluation
     int a = evaluation(poly2, 2);
-    printf("Résultat evaluation : %d\n", a);
+    printf("Résultat evaluation poly2 en x=2: %d\n", a);
 
     // Dérivée d'un polynôme
     polynome* poly1_prime = derivee(poly1);
-    printf("Résultat dérivée : ");
+    printf("Résultat dérivée poly1 : ");
     afficher(poly1_prime);
 
     // Somme de deux polynomes
@@ -54,60 +56,20 @@ void main_test() {
     printf("Produit de poly1 et poly2 : ");
     afficher(mult);
 
-    fonctions_non_demandees(poly1, poly2);
+    int borne = 4;
+    polynome* aleatoire = creer_poly_aleatoire(borne, borne);
+    printf("Polynome aléatoire de degrès %d, avec coefficients entre -%d et %d:\n", borne, borne, borne);
+    afficher(aleatoire);
 
+    int scalaire2 = 10; 
+    polynome* produit_scalaire = produit_par_scalaire(aleatoire, scalaire2);
+    printf("Produit du polynome aleatoire par %d: ", scalaire2);
+    afficher(produit_scalaire);
+
+    // Creation d'un polynome à la main
     printf("\nPolynome : \n");
     polynome* entree = creer_a_la_main();
     printf("Votre polynome : ");
     afficher(entree);
-
-    ask_newton(entree);
-
-}
-
-void fonctions_non_demandees(polynome* poly1, polynome* poly2) {
-
-    /* Ici se trouvent tous les tests relatifs aux fonctions non demandées  */
-
-
-    printf("\nFonctions non demandées:\n");
-
-    // Augmentation du degrès d'un polynome
-    polynome* raised = augmenter_degree(poly1, 5);
-    printf("Poly1 augmenté de 5 degrés : ");
-    afficher(raised);
-
-    // Division longue entre deux polynomes
-    polynome* div = division(poly1, poly2);
-    printf("Division de poly1 et poly2 : ");
-    afficher(div);
-
-    // Reste de la division longue entre deux polynomes
-    polynome* res = reste(poly1, poly2);
-    printf("Reste de la division de poly1 et poly2 : ");
-    afficher(res);
-
-    // Verification que le quotient et reste reforment bien le bon produit:
-    polynome* reconstruction = produit(div, poly2);
-    reconstruction = addition(reconstruction, res);
-    printf("Reconstruction de poly1 comme (poly2) * (poly1/poly2) + reste : ");
-    afficher(reconstruction);
-
-}
-
-void ask_newton(polynome* poly) {
-
-    /* Fonction qui permet de tester la méthode de newton en rajoutant un peu d'affichage */
-
-    double* x_0 = (double*)malloc(sizeof(double));
-
-    printf("\nMéthode de Newton (avec polynome fourni) : \n");
-    printf("Rentrez un nombre réel (décimal) pour la première approximation: ");
-    scanf("%lf", x_0);
-
-    double r = newtons_method(poly, *x_0, 30);
-
-    printf("Une racine du polynome se trouve approximativement en: %.15lf\n", r);
-    printf("On obtient le résultat suivant en évaluant le polynome en ce réel : %.15lf\n", evaluation_double(poly, r));
 
 }

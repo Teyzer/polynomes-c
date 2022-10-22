@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <assert.h>
+#include <time.h>
 #include "polynome.h"
 
 #ifndef TESTS
