@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <assert.h>
 #include "polynome.h"
 #include "tests.h"
 
@@ -8,6 +9,19 @@ void main_test() {
     /* Toutes les fonctions demandées sont écrites sans appel à une fonction auxiliaire */
 
     printf("\nDébut des tests\n\n");
+
+    // Listes d'assertions:
+    int tab_nul[1] = {0};
+    polynome* polynome_nul = creer_poly(tab_nul, -1);
+    int polytab[5] = {4, 5, 6, -8, -2};
+    polynome* poly_quelconque = creer_poly(polytab, 4);
+
+    assert(test_egalite(produit(polynome_nul, poly_quelconque), polynome_nul));
+    assert(test_egalite(produit_par_scalaire(polynome_nul, 5), polynome_nul));
+    assert(test_egalite(produit_par_scalaire(poly_quelconque, 0), polynome_nul));
+    assert(evaluation(poly_quelconque, 3) == -305);
+    assert(evaluation(polynome_nul, 450000054) == 0);;
+    assert(test_egalite(derivee(polynome_nul), polynome_nul));
 
 
     //Création et affichage de deux polynômes
